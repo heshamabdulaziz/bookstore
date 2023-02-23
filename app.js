@@ -10,6 +10,7 @@ const { string, number, required } = require('joi');
 
 
  // connect db with mongodb
+
  const dbc="mongodb+srv://hesham:alsofi2050@cluster0.d8tnilc.mongodb.net/?retryWrites=true&w=majority";
  mongoose.set('strictQuery', false);
 mongoose.connect(dbc)
