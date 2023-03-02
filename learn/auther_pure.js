@@ -1,8 +1,40 @@
 const express=require('express');
 const router=express.Router();
-const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Author")
+const Joi = require('joi');
+const{Author}=require("../model/Author")
 
+const authors=[
+    {
+    id:1,
+    firstName:'hesham',
+    lastName:'abdulaziz',
+    nationality:'canada',
 
+    },
+    {
+        id:2,
+        firstName:'ali',
+        lastName:'abdulaziz',
+        nationality:'canada',
+    
+        },
+        {
+            id:3,
+            firstName:'saaid',
+            lastName:'marhol',
+            nationality:'canada',
+        
+            },
+            {
+                id:4,
+                firstName:'ddsdsw',
+                lastName:'altyar',
+                nationality:'canada',
+            
+                },
+    
+    ]
+    
 /**
  * @desc  get all authors
  * @route  api/authors
@@ -24,21 +56,22 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
         
   /**
  * @desc  get all authors by id
- * @route  api/authors/:id //= params
+ * @route  api/authors/:id
  * @method  GET
  * @access PUBLIC
  */
         router.get('/:id',async(req,res)=>{
             try {
-            const author=await Author.findById(req.params.id) 
+                
+            const author=await Author.findById(req.params.id)// OR WE CAN USE  parseInt oR  + 
             if(author){ res.status(200).json(author) 
             }else{
-                res.status(404).json({message:" this author is not found"})  
+                res.status(400).json({message:" this author is not found"})  
             }
             
             } 
             catch (error) {
-                res.status(500).json({message:" something went wrong "})  
+                res.status(500).json({message:" something went wrong"})  
                 
             }
             
@@ -54,15 +87,21 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
         
     router.post('/',async(req,res)=>{
         // validation
-               
-           const{error}= validationCreateauthor(req.body);
+               const schema = Joi.object({
+                firstName:Joi.string().trim().min(3).max(200).required(),
+                lastName:Joi.string().trim().min(3).max(200).required(),
+                nationality:Joi.string().trim().min(3).max(100).required(),
+                image:Joi.string()
+
+                })
+                //const valid_input=schema.validate(req.body);
+                //  const error=valid_input.error;
+                const{error}= schema .validate(req.body);
+         
           if(error){
              return res.status(400).json({message:error.details[0].message})  //400 mean the problem from client mybe insert empty value
         
           }
-          /**
-           * @desc CREATE NEW AUTHOR
-           */
           try{
             const author=new Author(
                 {
@@ -73,14 +112,18 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
                    
                     })
                     const result=await author.save();
-                    //const {_id ,...othor}=result._doc;
                     res.status(201).json(result);  // 201 created 
-                     }
-                     catch(error){
-                        console.log(error)
-                       res.status(500).json({message: "something went wrong"}); 
-                        }
+          }catch(error){
+            console.log(error)
+            res.status(500).json({message: "something went wrong"}); 
+          }
         
+        
+                
+                //  if(addauthor){
+                //     authors.unshift(addauthor) ;
+                //    res.status(201).json(authors);  // 201 created 
+                //  }
                  
         
             })
@@ -97,7 +140,7 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
             const{error}= validationUpdateauthor(req.body);
             if(error){res.status(400).json({message:"author is not found"}) } //{message:"author was updated"}
           try {
-            const author=await Author.findByIdAndUpdate(req.params.id,{
+            const upd_author=await Author.findByIdAndUpdate(req.params.id,{
                 $set:{
                 firstName:req.body.firstName,
                 lastName:req.body.lastName,
@@ -105,7 +148,7 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
         },{new:true}
         
         )
-         res.status(200).json(author)
+         res.status(200).json(upd_author)
           } 
           catch (error) {
             console.log(error)
@@ -125,10 +168,10 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
  */
   router.delete('/:id',async(req,res)=>{
     try {
-        const author= await Author.findById(req.params.id)// first validit is it found in db or no 
+        const author= await Author.findById(req.params.id)// OR WE CAN USE  parseInt oR  + 
     if(author){
         const author= await Author.findByIdAndDelete(req.params.id)
-        res.status(200).json({message:"author has been  deleted"}) 
+        res.status(200).json({message:"author is deleted"}) 
     }else{
         res.status(400).json({message:"author is not found in db"})  
     }
@@ -143,7 +186,26 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
     
     })
 
-//
+            
+
+
+  
+
+  /**
+   * @desc function  validate author before update
+   */
+  function  validationUpdateauthor(obj){
+
+               const schema = Joi.object({
+                firstName:Joi.string().trim().min(3).max(200),
+                lastName:Joi.string().trim().min(3).max(200),
+                nationality:Joi.string().trim().min(3).max(200),
+                image:Joi.string()
+
+            
+                })
+        return  schema .validate(obj);
+  }
 
 
 
