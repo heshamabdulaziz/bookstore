@@ -1,26 +1,22 @@
 const express=require('express');
 const router=express.Router();
+const  asynchandlar=require('express-async-handler');
 const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Author")
+const {User,validatCreateuser,validationUpdateuser,validatLoginuser}=require("../model/User.js")
+
 
 
 /**
- * @desc  get all authors
+ * @desc  get  user
  * @route  api/authors
  * @method  GET
  * @access PUBLIC
  */
-    router.get('/',async(req,res)=>{
-        try {
-       //.sort({firstName:1}).select("firstName lastName -_id");
-        const autherlist=await Author.find();
-        res.status(200).json(autherlist)  
-        } 
-        catch (error) {
-            res.status(500).json({message:"something went wrong 11"})  
-        }
-       
-        
-        })
+    router.get('/',asynchandlar(async(req,res)=>{
+        const userlist=await Author.find();
+        res.status(200).json(userlist)  
+      
+            }  ))
         
   /**
  * @desc  get all authors by id
@@ -30,8 +26,8 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
  */
         router.get('/:id',async(req,res)=>{
             try {
-            const author=await Author.findById(req.params.id) 
-            if(author){ res.status(200).json(author) 
+            const user=await User.findById(req.params.id) 
+            if(au){ res.status(200).json(author) 
             }else{
                 res.status(404).json({message:" this author is NOT found"})  
             }
@@ -45,47 +41,8 @@ const{Author,validationCreateauthor,validationUpdateauthor}=require("../model/Au
             
             })
 
- /**
- * @desc  CREATE NEW  authors
- * @route  api/authors
- * @method  POST
- * @access PUBLIC
- */
-        
-    router.post('/',async(req,res)=>{
-        // validation
-               
-           const{error}= validationCreateauthor(req.body);
-          if(error){
-             return res.status(400).json({message:error.details[0].message})  //400 mean the problem from client mybe insert empty value
-        
-          }
-          /**
-           * @desc CREATE NEW AUTHOR
-           */
-          try{
-            const author=new Author(
-                {
-                    firstName:req.body.firstName,
-                    lastName:req.body.lastName,
-                    nationality:req.body.nationality,
-                    image:req.body.image
-                   
-                    })
-                    const result=await author.save();
-                    //const {_id ,...othor}=result._doc;
-                    res.status(201).json(result);  // 201 created 
-                     }
-                     catch(error){
-                        console.log(error)
-                       res.status(500).json({message: "something went wrong"}); 
-                        }
-        
-                 
-        
-            })
-
-             /**
+ 
+            /**
             * @desc UPDATE   author
             * @route  api/authors/:ID
             * @method  PUT

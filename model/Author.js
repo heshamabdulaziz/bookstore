@@ -33,7 +33,7 @@ const  Autherschama=new mongoose.Schema({
 { timestamps:true}
 
 )
-const Author=mongoose.model('Auther',Autherschama)
+const Author=mongoose.model('Author',Autherschama)
 // end  Autherschama
 
 function  validationCreateauthor(obj) 
